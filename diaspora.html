@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Share on Diaspora* Button</title>
+<script type="text/javascript">
+
+
+var selectedText = "";
+
+
+safari.application.addEventListener("command", respondToCommand, true);
+safari.application.addEventListener("message", respondToMessage, false);
+
+function stripTrailingSlashes(str)
+{
+  str = str.replace(/\/+$/, '');
+  return str;
+}
+
+function citeString(str)
+{
+  return '> [...] ' + str
+          .replace(/\s+$/, '')
+          .replace(/(\n\n)/g, "\n\n> ")
+          + " [...]";//str.replace(/(^|\n\n)/g, "$1>");
+}
+
+function openNewTab(url)
+{
+  var defaultUrl = 'http://stephanhepper.com/#diasporasharer.html_ajax';
+  if (url.indexOf(defaultUrl) === -1)
+  {
+    safari.application.activeBrowserWindow.openTab().url = url;
+  } else {
+    safari.application.activeBrowserWindow.openTab().url = defaultUrl;
+  }
+}
+
+// called back after selection was updated...
+function respondToMessage(event)
+{
+  if (event.name === "updateSelection")
+  {
+    selectedText = event.message;
+
+    // trigger the diaspora load:
+    var pageUrl = safari.application.activeBrowserWindow.activeTab.url,
+        pageTitle = safari.application.activeBrowserWindow.activeTab.title,
+        shareContent = (selectedText.length ? '### ':(safari.extension.settings.diasporaMessage+'\n\n> ')) + pageTitle+'\n\n' +
+                       (selectedText.length ? citeString(selectedText) +
+                       '\n\n---\n\n':'') +
+                       (selectedText.length ? 'found here: ':'')+ pageUrl,
+        shareUrl = stripTrailingSlashes(safari.extension.settings.diasporaPodUrl)+'/bookmarklet?content='+encodeURIComponent(shareContent) + '&v=1';
+
+    openNewTab(shareUrl);
+  }
+}
+
+function respondToCommand(event)
+{
+  if (event.command === 'share')
+  {
+    if (safari.application.activeBrowserWindow.activeTab.url)
+    {
+      // send update selection request:
+      safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("getCurrentSelection", "");
+    } else {
+      openNewTab(safari.extension.settings.diasporaPodUrl);
+    }
+  }
+}
+
+
+
+</script>
+</head>
+<body>
+
+</body>
+</html>
