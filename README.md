@@ -2,6 +2,8 @@
 
 A simple Safari extension, that adds a share via diaspora* button to the top-bar.
 
+[Download the Extension.](http://stephanhepper.com/diasporashare.safariextz)
+
 ![Screenshot of Share*](https://raw.githubusercontent.com/heppstux/diasporashare.safariextension/master/screenshot.png "Simple but efficient")
 
 ##Features
